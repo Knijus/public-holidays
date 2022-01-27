@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CountriesEntity } from '../entity/countries.entity';
-import { CountriesInterface } from '../entity/countries.interface';
+import { CountriesEntity } from '../models/countries.entity';
+import { CountriesInterface } from '../models/countries.interface';
 
 @Injectable()
 export class CountriesService {
