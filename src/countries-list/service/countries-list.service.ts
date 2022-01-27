@@ -17,7 +17,7 @@ export class CountriesListService {
 	async getCountriesList(): Promise<any> {
 		const allCountries = await this.countriesListRepository.find();
 
-		if (allCountries) {
+		if (allCountries.length) {
 			return  allCountries;
 		}
 
