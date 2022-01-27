@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CountriesListModule } from './countries-list/countries-list.module';
+import { CountriesModule } from './countries/countries.module';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { CountriesListModule } from './countries-list/countries-list.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    CountriesListModule
+    CountriesModule
   ],
 })
 export class AppModule {}

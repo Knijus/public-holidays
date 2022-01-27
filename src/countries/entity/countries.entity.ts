@@ -1,7 +1,13 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
+interface fromToDate {
+	day: number;
+	month: number;
+	year: number;
+}
+
 @Entity()
-export class CountriesListEntity {
+export class CountriesEntity {
 	@PrimaryColumn()
 	countryCode: string;
 
@@ -14,10 +20,10 @@ export class CountriesListEntity {
 	@Column()
 	fullName: string;
 
-	// @Column("text", { array: true})
-	// fromDate: JSON;
+	@Column("json")
+	fromDate: fromToDate;
 
-	// @Column("text", { array: true})
-	// toDate: JSON;
+	@Column("json")
+	toDate: fromToDate;
 
 }
