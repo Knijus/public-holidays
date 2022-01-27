@@ -6,7 +6,7 @@ export class CountriesListController {
 	constructor(private readonly countriesListService: CountriesListService) {}
 
 	@Get()
-	async getCountriesList(): Promise<JSON> {
+	async getCountriesList(): Promise<any> {
 		return await this.countriesListService.getCountriesList();
 	}
 }
