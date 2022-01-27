@@ -14,7 +14,6 @@ export class CountriesService {
 		private httpService: HttpService
 	) {}
 
-
 	async getCountries(): Promise<CountriesInterface[]> {
 		const allCountries = await this.countriesRepository.find();
 		
