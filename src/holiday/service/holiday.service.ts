@@ -18,8 +18,8 @@ export class HolidayService {
 		const countryHoliday = await this.holidayRepository.findOne(countryCodeYear);
 
 		if (countryHoliday) {
-			const holidaysByMonth = countryHoliday.month;
-			return holidaysByMonth;
+			console.log("db");
+			return countryHoliday.month;
 		}
 
 		const ResponseFromEnrico = await this.httpService
@@ -28,27 +28,33 @@ export class HolidayService {
 
 		const HolidaysByMonths = {};
 
-		for (let x = 1; x<= 12; x++) {
-			HolidaysByMonths[x]= [];
-		}		
+		for (let monthNum = 0; monthNum <= 11; monthNum++) {
+			const date = new Date(2000, monthNum, 1)
+			const shortMonth = date.toLocaleString("en-us", {month: "short"});
+			HolidaysByMonths[shortMonth]= [];
+		}
 
 		if (ResponseFromEnrico.data.length) {
 			ResponseFromEnrico.data.forEach((data) => {
 				const day = {
-					day: data.date.day,
-					month: data.date.month,
-					year: data.date.year,
+					date: new Date(data.date.year, data.date.month-1, data.date.day)
+					.toLocaleString("en", {year: "numeric", month: "short", day:"numeric"}),
 					dayOfWeek: data.date.dayOfWeek,
 					name: data.name,
 					holidayType: data.holidayType,
 				}
-				HolidaysByMonths[data.date.month].push(day);
+
+				for (let month in HolidaysByMonths) {
+					if(day.date.includes(HolidaysByMonths[month])) {
+						HolidaysByMonths[month].push(day);
+					}
+				}
 			});
 
 			const saveToPg = {id: countryCodeYear, month: HolidaysByMonths};
 
 			this.holidayRepository.save(saveToPg);
-
+			console.log("enrico");
 			return HolidaysByMonths	
 		} else {
 			throw new HttpException({
