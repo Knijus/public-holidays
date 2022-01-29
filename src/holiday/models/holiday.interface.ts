@@ -1,22 +1,20 @@
 export interface HolidayInterface {
-	1?:Days;
-	2?:Days;
-	3?:Days;
-	4?:Days;
-	5?:Days;
-	6?:Days;
-	7?:Days;
-	8?:Days;
-	9?:Days;
-	10?:Days;
-	11?:Days;
-	12?:Days;
+	jan?:Days;
+	feb?:Days;
+	mar?:Days;
+	apr?:Days;
+	may?:Days;
+	jun?:Days;
+	jul?:Days;
+	aug?:Days;
+	sep?:Days;
+	oct?:Days;
+	nov?:Days;
+	dec?:Days;
 }
 
 interface Days {
-	day: number;
-	month: number;
-	year: number;
+	date: Date;
 	dayOfWeek: number;
 	Name: JSON[];
 	holidayType: string;
