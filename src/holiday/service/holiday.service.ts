@@ -18,7 +18,6 @@ export class HolidayService {
 		const countryHoliday = await this.holidayRepository.findOne(countryCodeYear);
 
 		if (countryHoliday) {
-			console.log("db");
 			const holidaysByMonth = countryHoliday.month;
 			return holidaysByMonth;
 		}
@@ -49,7 +48,6 @@ export class HolidayService {
 			const saveToPg = {id: countryCodeYear, month: HolidaysByMonths};
 
 			this.holidayRepository.save(saveToPg);
-			console.log("enrico");
 
 			return HolidaysByMonths	
 		} else {
@@ -58,8 +56,5 @@ export class HolidayService {
 				error: ResponseFromEnrico.data.error
 			}, HttpStatus.NOT_FOUND);
 		}
-
-
-
 	}
 }

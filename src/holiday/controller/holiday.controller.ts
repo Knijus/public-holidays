@@ -8,9 +8,6 @@ export class HolidayController {
 
 	@Get()
 	async getCountryHolidays(@Query("country") countryCode="ltu", @Query("year") year=2022): Promise<HolidayInterface> {
-		
-		console.log(`request ${countryCode}, ${year}`);
 		return await this.holidayService.getCountryHoliday(countryCode, year);
-		
 	}
 }
