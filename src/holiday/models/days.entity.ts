@@ -1,11 +1,27 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { DaysInterface } from './days.interface';
 
 @Entity()
 export class DaysEntity {
   @PrimaryColumn()
-  id: string; //countryCode and year. example: ltu2022
+  countryCode: string;
 
-  @Column('json')
-  month: DaysInterface;
+  @PrimaryColumn()
+  year: number;
+
+  @Column()
+  date: Date;
+
+  @Column()
+  dayOfWeek: number;
+
+  @Column()
+  name: Name[];
+
+  @Column()
+  dayType: string;
+}
+
+interface Name {
+  lang: string;
+  text: string;
 }
