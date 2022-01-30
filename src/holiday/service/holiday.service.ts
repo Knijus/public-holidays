@@ -57,11 +57,11 @@ export class HolidayService {
 	}
 }
 
-function getMonthName(date) {
+export function getMonthName(date) {
 	return new Date(date).toLocaleString("en", {month:"short"})
 }
 
-function getDateOnly(year, month,day) {
+function getDateOnly(year, month, day) {
 	return new Date(year, month-1, day)
-	.toLocaleString("en", {year: "numeric", month: "short", day:"numeric"})
+	.toLocaleString("en-GB", {year: "numeric", month: "short", day:"numeric"})
 }
