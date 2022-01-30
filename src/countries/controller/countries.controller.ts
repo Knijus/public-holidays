@@ -4,11 +4,10 @@ import { CountriesInterface } from '../models/countries.interface';
 
 @Controller('countries')
 export class CountriesController {
-	constructor(private readonly countriesService: CountriesService) {}
+  constructor(private readonly countriesService: CountriesService) {}
 
-	@Get()
-	async getCountries(): Promise<CountriesInterface[]> {
-		return await this.countriesService.getCountries();
-	}
+  @Get()
+  async getCountries(): Promise<CountriesInterface[]> {
+    return await this.countriesService.getCountries();
+  }
 }
-

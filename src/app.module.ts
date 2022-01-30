@@ -3,12 +3,13 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CountriesModule } from './countries/countries.module';
 import { HolidayModule } from './holiday/holiday.module';
+import { DayStatusModule } from './day-status/day-status.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true}),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
-      type: "postgres",
+      type: 'postgres',
       host: process.env.POSTGRES_HOST,
       port: parseInt(<string>process.env.POSTGRES_PORT),
       username: process.env.POSTGRES_USER,
@@ -18,7 +19,8 @@ import { HolidayModule } from './holiday/holiday.module';
       synchronize: true,
     }),
     CountriesModule,
-    HolidayModule
+    HolidayModule,
+    DayStatusModule,
   ],
 })
 export class AppModule {}
