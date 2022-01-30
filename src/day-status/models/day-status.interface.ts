@@ -1,1 +1,4 @@
-export interface DayStatus {}
+export interface DaysStatusInterface {
+	date: Date;
+	dayType: string;
+}
