@@ -18,7 +18,6 @@ export class HolidayService {
 		const countryHoliday = await this.holidayRepository.findOne(countryCodeYear);
 
 		if (countryHoliday) {
-			console.log("db");
 			return countryHoliday.month;
 		}
 
@@ -26,36 +25,29 @@ export class HolidayService {
 		.get(`${process.env.ENRICO_SERVICE}/${process.env.RESPONSE_TYPE}/${process.env.ENRICO_VERSION}?action=${process.env.ACTION_GET_HOLIDAYS_FOR_YEAR}&year=${year}&country=${countryCode}&holidayType=public_holiday`)
 		.toPromise();
 
-		const HolidaysByMonths = {};
+		const holidaysByMonths = {};
 
 		for (let monthNum = 0; monthNum <= 11; monthNum++) {
-			const date = new Date(2000, monthNum, 1)
-			const shortMonth = date.toLocaleString("en-us", {month: "short"});
-			HolidaysByMonths[shortMonth]= [];
+			const date = new Date(2000, monthNum, 1);
+			holidaysByMonths[getMonthName(date)]= [];
 		}
 
 		if (ResponseFromEnrico.data.length) {
 			ResponseFromEnrico.data.forEach((data) => {
 				const day = {
-					date: new Date(data.date.year, data.date.month-1, data.date.day)
-					.toLocaleString("en", {year: "numeric", month: "short", day:"numeric"}),
+					date: getDateOnly(data.date.year, data.date.month, data.date.day),
 					dayOfWeek: data.date.dayOfWeek,
 					name: data.name,
 					holidayType: data.holidayType,
 				}
+				holidaysByMonths[getMonthName(day.date)].push(day)
 
-				for (let month in HolidaysByMonths) {
-					if(day.date.includes(HolidaysByMonths[month])) {
-						HolidaysByMonths[month].push(day);
-					}
-				}
 			});
 
-			const saveToPg = {id: countryCodeYear, month: HolidaysByMonths};
+			const saveToPg = {id: countryCodeYear, month: holidaysByMonths};
 
 			this.holidayRepository.save(saveToPg);
-			console.log("enrico");
-			return HolidaysByMonths	
+			return holidaysByMonths	
 		} else {
 			throw new HttpException({
 				status: HttpStatus.NOT_FOUND,
@@ -63,4 +55,13 @@ export class HolidayService {
 			}, HttpStatus.NOT_FOUND);
 		}
 	}
+}
+
+function getMonthName(date) {
+	return new Date(date).toLocaleString("en", {month:"short"})
+}
+
+function getDateOnly(year, month,day) {
+	return new Date(year, month-1, day)
+	.toLocaleString("en", {year: "numeric", month: "short", day:"numeric"})
 }
