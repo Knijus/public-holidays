@@ -1,4 +1,4 @@
-export interface HolidayInterface {
+export interface DaysInterface {
 	jan?:Days;
 	feb?:Days;
 	mar?:Days;
@@ -15,7 +15,7 @@ export interface HolidayInterface {
 
 interface Days {
 	date: Date;
-	dayOfWeek: number;
-	Name: JSON[];
-	holidayType: string;
+	dayOfWeek?: number;
+	Name?: JSON[];
+	dayType: string;
 }

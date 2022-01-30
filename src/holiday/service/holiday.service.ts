@@ -2,18 +2,18 @@ import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { HolidayEntity } from '../models/holiday.entity';
-import { HolidayInterface } from '../models/holiday.interface';
+import { DaysEntity } from '../models/days.entity';
+import { DaysInterface } from '../models/days.interface';
 
 @Injectable()
 export class HolidayService {
 
 	constructor(
-		@InjectRepository(HolidayEntity)
-		private holidayRepository: Repository<HolidayEntity>,
+		@InjectRepository(DaysEntity)
+		private holidayRepository: Repository<DaysEntity>,
 		private httpService: HttpService) {}
 
-	async getCountryHoliday(countryCode: string, year: number): Promise<HolidayInterface> {
+	async getCountryHoliday(countryCode: string, year: number): Promise<DaysInterface> {
 		const countryCodeYear = countryCode + year;
 		const countryHoliday = await this.holidayRepository.findOne(countryCodeYear);
 
@@ -38,7 +38,7 @@ export class HolidayService {
 					date: getDateOnly(data.date.year, data.date.month, data.date.day),
 					dayOfWeek: data.date.dayOfWeek,
 					name: data.name,
-					holidayType: data.holidayType,
+					dayType: data.holidayType,
 				}
 				holidaysByMonths[getMonthName(day.date)].push(day)
 

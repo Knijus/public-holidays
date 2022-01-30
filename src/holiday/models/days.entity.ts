@@ -1,12 +1,12 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
-import { HolidayInterface } from "./holiday.interface";
+import { DaysInterface } from "./days.interface";
 
 @Entity()
-export class HolidayEntity {
+export class DaysEntity {
 	@PrimaryColumn()
 	id: string; //countryCode and year. example: ltu2022
 
 	@Column("json")
-	month: HolidayInterface;
+	month: DaysInterface;
 
 }
