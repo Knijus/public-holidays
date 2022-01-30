@@ -10,12 +10,12 @@ export class HolidayService {
 
 	constructor(
 		@InjectRepository(DaysEntity)
-		private holidayRepository: Repository<DaysEntity>,
+		private daysRepository: Repository<DaysEntity>,
 		private httpService: HttpService) {}
 
 	async getCountryHoliday(countryCode: string, year: number): Promise<DaysInterface> {
 		const countryCodeYear = countryCode + year;
-		const countryHoliday = await this.holidayRepository.findOne(countryCodeYear);
+		const countryHoliday = await this.daysRepository.findOne(countryCodeYear);
 
 		if (countryHoliday) {
 			return countryHoliday.month;
@@ -46,7 +46,7 @@ export class HolidayService {
 
 			const saveToPg = {id: countryCodeYear, month: holidaysByMonths};
 
-			this.holidayRepository.save(saveToPg);
+			this.daysRepository.save(saveToPg);
 			return holidaysByMonths	
 		} else {
 			throw new HttpException({
