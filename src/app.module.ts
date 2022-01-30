@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CountriesModule } from './countries/countries.module';
 import { HolidayModule } from './holiday/holiday.module';
+import { DayStatusModule } from './day-status/day-status.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { HolidayModule } from './holiday/holiday.module';
       synchronize: true,
     }),
     CountriesModule,
-    HolidayModule
+    HolidayModule,
+    DayStatusModule
   ],
 })
 export class AppModule {}
