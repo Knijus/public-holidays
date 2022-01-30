@@ -6,11 +6,8 @@ import { DaysEntity } from './models/days.entity';
 import { HolidayService } from './service/holiday.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([DaysEntity]),
-    HttpModule
-],
+  imports: [TypeOrmModule.forFeature([DaysEntity]), HttpModule],
   controllers: [HolidayController],
-  providers: [HolidayService]
+  providers: [HolidayService],
 })
 export class HolidayModule {}

@@ -7,9 +7,9 @@ import { DayStatusModule } from './day-status/day-status.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true}),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
-      type: "postgres",
+      type: 'postgres',
       host: process.env.POSTGRES_HOST,
       port: parseInt(<string>process.env.POSTGRES_PORT),
       username: process.env.POSTGRES_USER,
@@ -20,7 +20,7 @@ import { DayStatusModule } from './day-status/day-status.module';
     }),
     CountriesModule,
     HolidayModule,
-    DayStatusModule
+    DayStatusModule,
   ],
 })
 export class AppModule {}

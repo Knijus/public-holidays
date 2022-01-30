@@ -1,21 +1,21 @@
 export interface DaysInterface {
-	jan?:Days;
-	feb?:Days;
-	mar?:Days;
-	apr?:Days;
-	may?:Days;
-	jun?:Days;
-	jul?:Days;
-	aug?:Days;
-	sep?:Days;
-	oct?:Days;
-	nov?:Days;
-	dec?:Days;
+  jan?: Days;
+  feb?: Days;
+  mar?: Days;
+  apr?: Days;
+  may?: Days;
+  jun?: Days;
+  jul?: Days;
+  aug?: Days;
+  sep?: Days;
+  oct?: Days;
+  nov?: Days;
+  dec?: Days;
 }
 
 interface Days {
-	date: Date;
-	dayOfWeek?: number;
-	Name?: JSON[];
-	dayType: string;
+  date: Date;
+  dayOfWeek?: number;
+  Name?: JSON[];
+  dayType: string;
 }

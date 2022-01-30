@@ -7,24 +7,26 @@ import { CountriesInterface } from '../models/countries.interface';
 
 @Injectable()
 export class CountriesService {
+  constructor(
+    @InjectRepository(CountriesEntity)
+    private countriesRepository: Repository<CountriesEntity>,
+    private httpService: HttpService,
+  ) {}
 
-	constructor(
-		@InjectRepository(CountriesEntity)
-		private countriesRepository: Repository<CountriesEntity>, 
-		private httpService: HttpService
-	) {}
+  async getCountries(): Promise<CountriesInterface[]> {
+    const allCountries = await this.countriesRepository.find();
 
-	async getCountries(): Promise<CountriesInterface[]> {
-		const allCountries = await this.countriesRepository.find();
-		
-		if (allCountries.length) {
-			return allCountries;
-		}
+    if (allCountries.length) {
+      return allCountries;
+    }
 
-		const countriesFromEnrico = await this.httpService
-		.get(`${process.env.ENRICO_SERVICE}/${process.env.RESPONSE_TYPE}/${process.env.ENRICO_VERSION}?action=${process.env.ACTION_GET_SUPPORTED_COUNTRIES}`).toPromise();
+    const countriesFromEnrico = await this.httpService
+      .get(
+        `${process.env.ENRICO_SERVICE}/${process.env.RESPONSE_TYPE}/${process.env.ENRICO_VERSION}?action=${process.env.ACTION_GET_SUPPORTED_COUNTRIES}`,
+      )
+      .toPromise();
 
-		this.countriesRepository.save(countriesFromEnrico.data);
-		return countriesFromEnrico.data;
-	}
+    this.countriesRepository.save(countriesFromEnrico.data);
+    return countriesFromEnrico.data;
+  }
 }
