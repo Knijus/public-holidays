@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CountriesModule } from './countries/countries.module';
+import { HolidayModule } from './holiday/holiday.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { CountriesModule } from './countries/countries.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    CountriesModule
+    CountriesModule,
+    HolidayModule
   ],
 })
 export class AppModule {}
