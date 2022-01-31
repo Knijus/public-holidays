@@ -15,8 +15,10 @@ export class HolidayService {
 
   async getCountryHoliday(
     countryCode: string,
-    year: number,
+    yearStr: string,
   ): Promise<HolidayInterface> {
+    const year = parseInt(yearStr);
+    console.log()
 
     const countryHoliday = await this.daysRepository.find({where: {countryCode: countryCode, year: year, dayType: process.env.PUBLIC_HOLIDAY}});
     
@@ -31,7 +33,7 @@ export class HolidayService {
 
     const responseFromEnrico = await this.httpService
       .get(
-        `${process.env.ENRICO_SERVICE}/${process.env.RESPONSE_TYPE}/${process.env.ENRICO_VERSION}?action=${process.env.ACTION_GET_HOLIDAYS_FOR_YEAR}&year=${year}&country=${countryCode}&holidayType=public_holiday`,
+        `${process.env.ENRICO_SERVICE}/${process.env.RESPONSE_TYPE}/${process.env.ENRICO_VERSION}?action=${process.env.ACTION_GET_HOLIDAYS_FOR_YEAR}&year=${yearStr}&country=${countryCode}&holidayType=public_holiday`,
       )
       .toPromise();
 
