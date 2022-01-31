@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DaysEntity } from 'src/holiday/models/days.entity';
+import { HolidayInterface } from 'src/holiday/models/holiday.interface';
 import {
   getMonthName,
   HolidayService,
@@ -20,24 +21,24 @@ export class DayStatusService {
 
   async getDayStatus(
     countryCode: string,
-    date: Date,
+    inputDate: string,
   ): Promise<DaysStatusInterface> {
+    const date = new Date(inputDate);
+    
     const dayStatus = {
-      date: new Date(date).toLocaleDateString('en-GB', {
+      date: new Date(date).toLocaleDateString('en', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
       }),
       dayType: undefined,
     };
-    console.log(dayStatus);
     const year = new Date(date).getFullYear();
     const holidaysByMonths = await this.holidayService.getCountryHoliday(
       countryCode,
       year,
     );
-    console.log(holidaysByMonths);
-    const isHoliday = IfDayIsHoliday(date, holidaysByMonths);
+    const isHoliday = ifDayIsHoliday(date, holidaysByMonths);
 
     if (isHoliday) {
       dayStatus.dayType = isHoliday;
@@ -45,36 +46,33 @@ export class DayStatusService {
     }
 
     const dmyDate = formatToDmyDate(date);
-    const ResponseFromEnrico = await this.httpService
+    const responseFromEnrico = await this.httpService
       .get(
         `${process.env.ENRICO_SERVICE}/${process.env.RESPONSE_TYPE}/${process.env.ENRICO_VERSION}?action=${process.env.ACTION_IS_WORK_DAY}&date=${dmyDate}&country=${countryCode}`,
       )
       .toPromise();
 
-    if (ResponseFromEnrico.data.isWorkDay) {
+    if (responseFromEnrico.data.isWorkDay) {
       dayStatus.dayType = 'Workday';
     } else {
       dayStatus.dayType = 'Freeday';
     }
 
-    holidaysByMonths[getMonthName(dayStatus.date)].push(dayStatus);
-    await this.daysRepository.update(
-      { id: `${countryCode}${year}` },
-      { month: holidaysByMonths },
-    );
+    this.daysRepository.save({countryCode: countryCode, year: year, date: dayStatus.date, dayType: dayStatus.dayType});
+
     return dayStatus;
   }
 }
 
-function valueOfDate(date) {
+function valueOfDate(date: Date): number {
   return new Date(date).valueOf();
 }
 
-function IfDayIsHoliday(date, holidayArr) {
+function ifDayIsHoliday(date: Date, holidayArr: HolidayInterface): string | boolean {
   let isHoliday = undefined;
   for (const month in holidayArr) {
     holidayArr[month].forEach((day) => {
-      if (valueOfDate(date) == valueOfDate(day.date)) {
+      if (valueOfDate(date) === valueOfDate(day.date)) {
         isHoliday = day.dayType;
       }
     });
@@ -82,7 +80,7 @@ function IfDayIsHoliday(date, holidayArr) {
   return isHoliday;
 }
 
-function formatToDmyDate(inputDate) {
+function formatToDmyDate(inputDate: Date): string {
   const date = new Date(inputDate);
   return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 }

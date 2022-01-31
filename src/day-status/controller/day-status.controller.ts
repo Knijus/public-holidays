@@ -4,14 +4,13 @@ import { DayStatusService } from '../service/day-status.service';
 
 @Controller('dayStatus')
 export class DayStatusController {
-  constructor(private readonly holidayService: DayStatusService) {}
+  constructor(private readonly DayStatusService: DayStatusService) {}
 
   @Get()
   async getDayStatus(
-    @Query('country') countryCode,
-    @Query('date') date,
+    @Query('country') countryCode: string,
+    @Query('date') date: string,
   ): Promise<DaysStatusInterface> {
-    console.log('input:', countryCode, date);
-    return await this.holidayService.getDayStatus(countryCode, date);
+    return await this.DayStatusService.getDayStatus(countryCode, date);
   }
 }

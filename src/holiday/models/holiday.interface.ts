@@ -1,4 +1,4 @@
-export interface DaysInterface {
+export interface HolidayInterface {
   jan?: Days;
   feb?: Days;
   mar?: Days;

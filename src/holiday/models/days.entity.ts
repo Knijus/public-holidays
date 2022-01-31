@@ -1,27 +1,28 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class DaysEntity {
-  @PrimaryColumn()
+
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   countryCode: string;
 
-  @PrimaryColumn()
+  @Column()
   year: number;
 
   @Column()
   date: Date;
 
-  @Column()
-  dayOfWeek: number;
+  @Column({nullable: true})
+  dayOfWeek?: number;
 
-  @Column()
-  name: Name[];
+  @Column("json",{nullable: true})
+  name?: JSON;
 
   @Column()
   dayType: string;
 }
 
-interface Name {
-  lang: string;
-  text: string;
-}
+

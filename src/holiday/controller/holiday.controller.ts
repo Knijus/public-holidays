@@ -1,5 +1,5 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { DaysInterface } from '../models/days.interface';
+import { Controller, Get, Query } from '@nestjs/common';
+import { HolidayInterface } from '../models/holiday.interface';
 import { HolidayService } from '../service/holiday.service';
 
 @Controller('holiday')
@@ -10,7 +10,7 @@ export class HolidayController {
   async getCountryHolidays(
     @Query('country') countryCode = 'ltu',
     @Query('year') year = 2022,
-  ): Promise<DaysInterface> {
+  ): Promise<HolidayInterface> {
     return await this.holidayService.getCountryHoliday(countryCode, year);
   }
 }
