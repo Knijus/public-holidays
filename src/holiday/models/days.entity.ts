@@ -1,11 +1,28 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { DaysInterface } from './days.interface';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class DaysEntity {
-  @PrimaryColumn()
-  id: string; //countryCode and year. example: ltu2022
 
-  @Column('json')
-  month: DaysInterface;
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  countryCode: string;
+
+  @Column()
+  year: number;
+
+  @Column()
+  date: Date;
+
+  @Column({nullable: true})
+  dayOfWeek?: number;
+
+  @Column("json",{nullable: true})
+  name?: JSON;
+
+  @Column()
+  dayType: string;
 }
+
+
