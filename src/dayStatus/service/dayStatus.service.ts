@@ -36,7 +36,7 @@ export class DayStatusService {
     const year = new Date(date).getFullYear();
     const holidaysByMonths = await this.holidayService.getCountryHoliday(
       countryCode,
-      year,
+      year.toString(),
     );
     const isHoliday = ifDayIsHoliday(date, holidaysByMonths);
 
