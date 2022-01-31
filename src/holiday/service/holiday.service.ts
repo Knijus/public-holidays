@@ -18,7 +18,7 @@ export class HolidayService {
     year: number,
   ): Promise<HolidayInterface> {
 
-    const countryHoliday = await this.daysRepository.find({where: {countryCode: countryCode, year: year}});
+    const countryHoliday = await this.daysRepository.find({where: {countryCode: countryCode, year: year, dayType: process.env.PUBLIC_HOLIDAY}});
     
     if (countryHoliday.length) { 
       const tempArr = [];
