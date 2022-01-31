@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DayStatusController } from './day-status.controller';
+import { DayStatusController } from './dayStatus.controller';
 
 describe('DayStatusController', () => {
   let controller: DayStatusController;

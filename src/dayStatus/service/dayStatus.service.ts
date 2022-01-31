@@ -8,7 +8,7 @@ import {
   HolidayService,
 } from 'src/holiday/service/holiday.service';
 import { Repository } from 'typeorm';
-import { DaysStatusInterface } from '../models/day-status.interface';
+import { DaysStatusInterface } from '../models/dayStatus.interface';
 
 @Injectable()
 export class DayStatusService {
