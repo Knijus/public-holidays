@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { DaysStatusInterface } from '../models/day-status.interface';
-import { DayStatusService } from '../service/day-status.service';
+import { DaysStatusInterface } from '../models/dayStatus.interface';
+import { DayStatusService } from '../service/dayStatus.service';
 
 @Controller('dayStatus')
 export class DayStatusController {
