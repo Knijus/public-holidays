@@ -18,10 +18,10 @@ export class HolidayService {
     yearStr: string,
   ): Promise<HolidayInterface> {
     const year = parseInt(yearStr);
-    console.log()
+    console.log("input:", countryCode, yearStr);
 
     const countryHoliday = await this.daysRepository.find({where: {countryCode: countryCode, year: year, dayType: process.env.PUBLIC_HOLIDAY}});
-    
+    console.log("db", countryHoliday);
     if (countryHoliday.length) { 
       const tempArr = [];
       for (let {date: date, dayOfWeek: dow, name: name, dayType: dayType} of countryHoliday) {
@@ -36,6 +36,7 @@ export class HolidayService {
         `${process.env.ENRICO_SERVICE}/${process.env.RESPONSE_TYPE}/${process.env.ENRICO_VERSION}?action=${process.env.ACTION_GET_HOLIDAYS_FOR_YEAR}&year=${yearStr}&country=${countryCode}&holidayType=public_holiday`,
       )
       .toPromise();
+      console.log("enrico",responseFromEnrico.data);
 
     if (responseFromEnrico.data.length) {
       const tempArr = []
@@ -77,7 +78,7 @@ function groupByMonths(arr: Array<{date: Date, dayOfWeek?:number, name?: JSON[],
   const holidaysByMonths = {};
   for (let monthNum = 0; monthNum <= 11; monthNum++) {
 
-  const tempDate = new Date(arr[0].date.getFullYear(), monthNum, arr[0].date.getDate());
+  const tempDate = new Date(new Date(arr[0].date).getFullYear(), monthNum, new Date(arr[0].date).getDate());
   holidaysByMonths[getMonthName(tempDate).toLowerCase()] = [];
   };
 
