@@ -8,7 +8,7 @@ import {
   HolidayService,
 } from 'src/holiday/service/holiday.service';
 import { Repository } from 'typeorm';
-import { DaysStatusInterface } from '../models/dayStatus.interface';
+import { DayStatusInterface } from '../models/dayStatus.interface';
 
 @Injectable()
 export class DayStatusService {
@@ -22,7 +22,7 @@ export class DayStatusService {
   async getDayStatus(
     countryCode: string,
     inputDate: string,
-  ): Promise<DaysStatusInterface> {
+  ): Promise<DayStatusInterface> {
     const date = new Date(inputDate);
     
     const dayStatus = {
