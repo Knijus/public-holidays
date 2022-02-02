@@ -16,6 +16,6 @@ export interface HolidayInterface {
 interface Days {
   date: string;
   dayOfWeek: number;
-  name?: JSON[];
+  name: JSON[];
   dayType: string;
 }

@@ -8,8 +8,7 @@ import { HolidayService } from '../service/holiday.service';
 export class HolidayController {
   constructor(private readonly holidayService: HolidayService) {}
 
-  @Get()
-  
+  @Get()  
   @ApiOkResponse({ 
     description: "Returns public holiday days grouped by months for given country and year",
     type: HolidayDto })

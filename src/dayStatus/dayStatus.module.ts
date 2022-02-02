@@ -7,7 +7,10 @@ import { DayStatusController } from './controller/dayStatus.controller';
 import { DayStatusService } from './service/dayStatus.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([DaysEntity]), HttpModule],
+  imports: [
+    TypeOrmModule.forFeature([DaysEntity]), 
+    HttpModule
+  ],
   controllers: [DayStatusController],
   providers: [DayStatusService, HolidayService],
 })

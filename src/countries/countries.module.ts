@@ -6,10 +6,11 @@ import { CountriesEntity } from './models/countries.entity';
 import { CountriesService } from './service/countries.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CountriesEntity]), HttpModule],
-
+  imports: [
+    TypeOrmModule.forFeature([CountriesEntity]),
+    HttpModule
+  ],
   controllers: [CountriesController],
-
   providers: [CountriesService],
 })
 export class CountriesModule {}

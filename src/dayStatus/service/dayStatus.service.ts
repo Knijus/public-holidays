@@ -3,10 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DaysEntity } from 'src/holiday/models/days.entity';
 import { HolidayInterface } from 'src/holiday/models/holiday.interface';
-import {
-  getMonthName,
-  HolidayService,
-} from 'src/holiday/service/holiday.service';
+import { HolidayService } from 'src/holiday/service/holiday.service';
 import { Repository } from 'typeorm';
 import { DayStatusInterface } from '../models/dayStatus.interface';
 
@@ -26,14 +23,14 @@ export class DayStatusService {
     const date = new Date(inputDate);
     
     const dayStatus = {
-      date: new Date(date).toLocaleDateString('en', {
+      date: date.toLocaleDateString('en', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
       }),
       dayType: undefined,
     };
-    const year = new Date(date).getFullYear();
+    const year = date.getFullYear();
     const holidaysByMonths = await this.holidayService.getCountryHoliday(
       countryCode,
       year.toString(),
@@ -64,15 +61,11 @@ export class DayStatusService {
   }
 }
 
-function valueOfDate(date: Date): number {
-  return new Date(date).valueOf();
-}
-
 function ifDayIsHoliday(date: Date, holidayArr: HolidayInterface): string | boolean {
   let isHoliday = undefined;
   for (const month in holidayArr) {
     holidayArr[month].forEach((day) => {
-      if (valueOfDate(date) === valueOfDate(day.date)) {
+      if (date.valueOf() == new Date(day.date).valueOf()) {
         isHoliday = day.dayType;
       }
     });
@@ -80,7 +73,6 @@ function ifDayIsHoliday(date: Date, holidayArr: HolidayInterface): string | bool
   return isHoliday;
 }
 
-function formatToDmyDate(inputDate: Date): string {
-  const date = new Date(inputDate);
-  return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+function formatToDmyDate(date: Date): string {
+    return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 }
