@@ -16,6 +16,8 @@ Small API project using Nestjs and Postgres. API has several endpoints:
   - will be added one more endpoint, where it returns longest in row holidays (freedays and holidays) for given country and year
   - furher improvements for service logic, error handling and etc.
 
+  Project is deployed on heroku server [publicholiday](https://publicholiday.herokuapp.com/api)
+
   ## 
 
 ## **Installation**
