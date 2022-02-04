@@ -4,7 +4,7 @@ import { MaxFreedayDto } from "../dto/maxFreeday.dto";
 import { MaxFreedayInterface } from "../models/maxFreeday.interface";
 import { MaxFreedayService } from "../service/maxFreeday.service";
 
-@Controller('holiday')
+@Controller('maxFreeday')
 export class MaxFreedayController {
   constructor(private readonly maxFreedayService: MaxFreedayService) {}
 
