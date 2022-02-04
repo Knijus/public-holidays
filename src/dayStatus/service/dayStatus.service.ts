@@ -1,8 +1,8 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DaysEntity } from 'src/holiday/models/days.entity';
-import { HolidayInterface } from 'src/holiday/models/holiday.interface';
+import { DayInterface } from 'src/holiday/models/day.interface';
 import { HolidayService } from 'src/holiday/service/holiday.service';
 import { Repository } from 'typeorm';
 import { DayStatusInterface } from '../models/dayStatus.interface';
@@ -31,15 +31,18 @@ export class DayStatusService {
       dayOfWeek: (date.getDay() === 0 ? 7: date.getDay()),
       dayType: undefined,
     };
-    const year = date.getFullYear();
-    const holidays = await this.holidayService.getCountryHoliday(
-      countryCode,
-      year.toString(),
-    );
-    const isHoliday = ifDayIsHoliday(date, holidays);
 
-    if (isHoliday) {
-      dayStatus.dayType = isHoliday;
+    const year = date.getFullYear();
+    const publicHoliday = process.env.PUBLIC_HOLIDAY;
+
+    const days = await this.holidayService.getDaysFromDb(
+      countryCode,
+      year.toString()
+    );
+    const isInArr = isDayInArr(date, days);
+
+    if (isInArr) {
+      dayStatus.dayType = isInArr;
       return dayStatus;
     }
 
@@ -50,11 +53,19 @@ export class DayStatusService {
       )
       .toPromise();
 
-    if (responseFromEnrico.data.isWorkDay) {
-      dayStatus.dayType = 'Workday';
+    if (responseFromEnrico.data.isWorkDay === true) {
+      dayStatus.dayType = process.env.WORKDAY;
+    } else if (responseFromEnrico.data.isWorkDay === false){
+      dayStatus.dayType = process.env.FREEDAY;
     } else {
-      dayStatus.dayType = 'Freeday';
-    }
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: responseFromEnrico.data.error,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
 
     this.daysRepository.save({countryCode: countryCode, year: year, date: dayStatus.date, dayOfWeek: dayStatus.dayOfWeek, dayType: dayStatus.dayType});
 
@@ -62,15 +73,15 @@ export class DayStatusService {
   }
 }
 
-function ifDayIsHoliday(date: Date, holidayArr: Array<HolidayInterface>): string | boolean {
-  let isHoliday = undefined;
+function isDayInArr(date: Date, daysArr: Array<DayInterface>): string | boolean {
+  let isInArr = undefined;
  
-  holidayArr.forEach((day) => {
+  daysArr.forEach((day) => {
     if (date.valueOf() == new Date(day.date).valueOf()) {
-      isHoliday = day.dayType;
+      isInArr = day.dayType;
     }
   });
-  return isHoliday;
+  return isInArr;
 }
 
 function formatToDmyDate(date: Date): string {

@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { HolidayDto } from '../dto/holiday.dto';
-import { HolidayGroupedByMonthsInterface} from '../models/holidaysGroupedByMonths.interface';
+import { HolidayInterface} from '../models/holiday.interface';
 import { HolidayService } from '../service/holiday.service';
 
 @Controller('holiday')
@@ -16,7 +16,7 @@ export class HolidayController {
   async getCountryHolidays(
     @Query('country') countryCode: string,
     @Query('year') year: string,
-  ): Promise<HolidayGroupedByMonthsInterface> {
+  ): Promise<HolidayInterface> {
     return await this.holidayService.holidayGroupedByMonths(countryCode, year);
   }
 }
