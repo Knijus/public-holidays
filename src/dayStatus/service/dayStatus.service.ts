@@ -32,11 +32,11 @@ export class DayStatusService {
       dayType: undefined,
     };
     const year = date.getFullYear();
-    const holidaysByMonths = await this.holidayService.getCountryHoliday(
+    const holidays = await this.holidayService.getCountryHoliday(
       countryCode,
       year.toString(),
     );
-    const isHoliday = ifDayIsHoliday(date, holidaysByMonths);
+    const isHoliday = ifDayIsHoliday(date, holidays);
 
     if (isHoliday) {
       dayStatus.dayType = isHoliday;
@@ -56,21 +56,20 @@ export class DayStatusService {
       dayStatus.dayType = 'Freeday';
     }
 
-    this.daysRepository.save({countryCode: countryCode, year: year, date: dayStatus.date, dayType: dayStatus.dayType});
+    this.daysRepository.save({countryCode: countryCode, year: year, date: dayStatus.date, dayOfWeek: dayStatus.dayOfWeek, dayType: dayStatus.dayType});
 
     return dayStatus;
   }
 }
 
-function ifDayIsHoliday(date: Date, holidayArr: HolidayInterface): string | boolean {
+function ifDayIsHoliday(date: Date, holidayArr: Array<HolidayInterface>): string | boolean {
   let isHoliday = undefined;
-  for (const month in holidayArr) {
-    holidayArr[month].forEach((day) => {
-      if (date.valueOf() == new Date(day.date).valueOf()) {
-        isHoliday = day.dayType;
-      }
-    });
-  }
+ 
+  holidayArr.forEach((day) => {
+    if (date.valueOf() == new Date(day.date).valueOf()) {
+      isHoliday = day.dayType;
+    }
+  });
   return isHoliday;
 }
 
