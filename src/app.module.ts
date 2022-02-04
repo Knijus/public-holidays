@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CountriesModule } from './countries/countries.module';
 import { HolidayModule } from './holiday/holiday.module';
 import { DayStatusModule } from './dayStatus/dayStatus.module';
+import { MaxFreedayModule } from './maxFreeday/maxFreeday.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { DayStatusModule } from './dayStatus/dayStatus.module';
     CountriesModule,
     HolidayModule,
     DayStatusModule,
+    MaxFreedayModule,
   ],
 })
 export class AppModule {}
