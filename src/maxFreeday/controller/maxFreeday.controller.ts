@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from "@nestjs/common";
 import { ApiOkResponse } from "@nestjs/swagger";
-import { Freedays } from "../dto/Freedays.dto";
+import { MaxFreedayDto } from "../dto/maxFreeday.dto";
+import { MaxFreedayInterface } from "../models/maxFreeday.interface";
 import { MaxFreedayService } from "../service/maxFreeday.service";
 
 @Controller('holiday')
@@ -10,13 +11,13 @@ export class MaxFreedayController {
   @Get()  
   @ApiOkResponse({ 
     description: "Returns max number of freedays in row for given country and year",
-    type: Freedays,
+    type: MaxFreedayDto,
 	})
 
   async getCountryHolidays(
     @Query('country') countryCode: string,
     @Query('year') year: string,
-  ): Promise<any> {
+  ): Promise<MaxFreedayInterface> {
     return await this.maxFreedayService.getMaxFreedays(countryCode, year);
   }
 }
