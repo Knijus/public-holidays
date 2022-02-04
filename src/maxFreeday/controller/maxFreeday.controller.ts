@@ -9,7 +9,7 @@ export class MaxFreedayController {
 
   @Get()  
   @ApiOkResponse({ 
-    description: "Returns public holiday days grouped by months for given country and year",
+    description: "Returns max number of freedays in row for given country and year",
     type: Freedays,
 	})
 
