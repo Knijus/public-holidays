@@ -28,6 +28,7 @@ export class DayStatusService {
         month: 'short',
         day: 'numeric',
       }),
+      dayOfWeek: (date.getDay() === 0 ? 7: date.getDay()),
       dayType: undefined,
     };
     const year = date.getFullYear();
