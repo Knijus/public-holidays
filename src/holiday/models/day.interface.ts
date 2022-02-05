@@ -1,5 +1,5 @@
 export interface DayInterface {
-	date: Date;
+	date: string;
 	dayOfWeek: number;
 	name?: JSON[];
 	dayType: string;
