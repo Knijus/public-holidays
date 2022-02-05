@@ -17,7 +17,7 @@ export class MaxFreedayController {
   async getCountryHolidays(
     @Query('country') countryCode: string,
     @Query('year') year: string,
-  ): Promise<MaxFreedayInterface> {
+  ): Promise<Array<MaxFreedayInterface>> {
     return await this.maxFreedayService.getMaxFreedays(countryCode, year);
   }
 }
