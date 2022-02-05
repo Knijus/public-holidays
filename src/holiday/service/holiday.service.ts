@@ -27,7 +27,7 @@ export class HolidayService {
         countryHolidays[0].date).getFullYear(), 
         monthNum, 
         new Date(countryHolidays[0].date).getDate()
-        );
+        ).toUTCString();
       holidaysByMonths[getMonthName(tempDate).toLowerCase()] = [];
     };
   
@@ -50,17 +50,12 @@ export class HolidayService {
     const countryHolidays = [];
     const publicHoliday = process.env.PUBLIC_HOLIDAY;
     const daysFromDb = await this.getDaysFromDb(countryCode, year);
-
     if(daysFromDb.length) {
       daysFromDb.forEach(day => {
         if (day.dayType === publicHoliday) {
           countryHolidays.push(day);
         }
       }); 
-    }
-    
-    if (countryHolidays.length) {
-      return countryHolidays
     }
     return this.holidayFromEnrico(countryCode, year);
 
@@ -98,17 +93,19 @@ export class HolidayService {
   
     if (responseFromEnrico.data.length) {
       const holidays = []
-      responseFromEnrico.data.forEach((data) => {
+      responseFromEnrico.data.forEach(async (data) => {
         const day = {
           countryCode: countryCode,
           year: parseInt(year),
-          date: new Date(data.date.year, data.date.month -1, data.date.day),
+          date: new Date(Date.UTC(data.date.year, data.date.month -1, data.date.day)),
           dayOfWeek: data.date.dayOfWeek,
           name: data.name,
           dayType: data.holidayType,
         }
-        this.daysRepository.save(day);
         holidays.push({	date: day.date, dayOfWeek: day.dayOfWeek, name: day.name, dayType: day.dayType});
+
+        await this.daysRepository.save(day);
+        
       });
       return holidays;
     
@@ -125,7 +122,7 @@ export class HolidayService {
 
 }
 
-export function getMonthName(date: Date): string {
+export function getMonthName(date: string): string {
   return new Date(date).toLocaleString('en', { month: 'short' }).toLowerCase();
 }
 
