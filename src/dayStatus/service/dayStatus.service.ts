@@ -33,16 +33,11 @@ export class DayStatusService {
     };
 
     const year = date.getFullYear();
-    const publicHoliday = process.env.PUBLIC_HOLIDAY;
 
-    const days = await this.holidayService.getDaysFromDb(
-      countryCode,
-      year.toString()
-    );
-    const isInArr = isDayInArr(date, days);
+    const isInDB = await this.daysRepository.findOne({where: {countryCode: countryCode, year: year, date: date}});
 
-    if (isInArr) {
-      dayStatus.dayType = isInArr;
+    if (isInDB) {
+      dayStatus.dayType = isInDB.dayType;
       return dayStatus;
     }
 
@@ -71,17 +66,6 @@ export class DayStatusService {
 
     return dayStatus;
   }
-}
-
-function isDayInArr(date: Date, daysArr: Array<DayInterface>): string | boolean {
-  let isInArr = undefined;
- 
-  daysArr.forEach((day) => {
-    if (date.valueOf() == new Date(day.date).valueOf()) {
-      isInArr = day.dayType;
-    }
-  });
-  return isInArr;
 }
 
 function formatToDmyDate(date: Date): string {
