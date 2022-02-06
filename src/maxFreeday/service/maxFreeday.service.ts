@@ -33,52 +33,57 @@ export class MaxFreedayService {
 				
 			}]
 
-			for (let dayIndex = 0; dayIndex < holidays.length; dayIndex++) {
-				if(dayIndex <1 || new Date(holidays[dayIndex-1].date).setDate(new Date(holidays[dayIndex-1].date).getDate() +1).valueOf() !== new Date(holidays[dayIndex].date).valueOf()) {
-					const holidayFreedays = {
-						holiday: holidays[dayIndex].name,
-						numberOfFreedays: 1,
-						days: [{
-							date:  new Date(holidays[dayIndex].date).toLocaleDateString('en', {
-								year: 'numeric',
-								month: 'short',
-								day: 'numeric',
-								}),
-							dayOfWeek: holidays[dayIndex].dayOfWeek,
-							dayType: holidays[dayIndex].dayType,
-						}],
-						
-					}
-					
-					for (let i = 1; i < 5; i++) {
-						let dayDate = new Date(holidays[dayIndex].date);
-						dayDate.setDate(dayDate.getDate()-i);
-						const dayStatus = await this.dayStatusService.getDayStatus(countryCode, dayDate.toString());
-						if(dayStatus.dayType === "workday") {
-							break;
-						}	
-						holidayFreedays.days.unshift(dayStatus);
-						holidayFreedays.numberOfFreedays++;
-					}
-					for (let i = 1; i < 5; i++) {
-						let dayDate = new Date(holidays[dayIndex].date);
-						dayDate.setDate(dayDate.getDate()+i);
-						const dayStatus = await this.dayStatusService.getDayStatus(countryCode, dayDate.toString());
-						if(dayStatus.dayType === "workday") {
-							break;
-						}	
-						holidayFreedays.days.push(dayStatus);
-						holidayFreedays.numberOfFreedays++;
-					}
-					if(holidayFreedays.numberOfFreedays > maxFreedays[0].numberOfFreedays) {
-						maxFreedays = [];
-						maxFreedays.push(holidayFreedays);
-					} else if (holidayFreedays.numberOfFreedays === maxFreedays[0].numberOfFreedays) {
-						maxFreedays.push(holidayFreedays);
-					}
+			holidays
+			.filter((holiday,index) => {
+				 return index === 0 ||
+				new Date(holidays[index-1].date).setDate(new Date(holidays[index-1].date).getDate() +1).valueOf() !== new Date(holiday.date).valueOf()
+			})
+			.forEach(async holiday => {
+				const holidayFreedays = {
+					holiday: holiday.name,
+					numberOfFreedays: 1,
+					days: [{
+						date:  new Date(holiday.date).toLocaleDateString('en', {
+							year: 'numeric',
+							month: 'short',
+							day: 'numeric',
+							}),
+						dayOfWeek: holiday.dayOfWeek,
+						dayType: holiday.dayType,
+					}],
 				}
 
-			}
-			return maxFreedays
+				for (let i = 1; i < 5; i++) {
+					let dayDate = new Date(holiday.date);
+					dayDate.setDate(dayDate.getDate()-i);
+					const dayStatus = await this.dayStatusService.getDayStatus(countryCode, dayDate.toString());
+					if(dayStatus.dayType === "workday") {
+						break;
+					}	
+					holidayFreedays.days.unshift(dayStatus);
+					holidayFreedays.numberOfFreedays++;
+				}
+
+				for (let i = 1; i < 5; i++) {
+					let dayDate = new Date(holiday.date);
+					dayDate.setDate(dayDate.getDate()+i);
+					const dayStatus = await this.dayStatusService.getDayStatus(countryCode, dayDate.toString());
+					if(dayStatus.dayType === "workday") {
+						break;
+					}	
+					holidayFreedays.days.push(dayStatus);
+					holidayFreedays.numberOfFreedays++;
+				}
+
+				if(holidayFreedays.numberOfFreedays > maxFreedays[0].numberOfFreedays) {
+					maxFreedays = [];
+					maxFreedays.push(holidayFreedays);
+				} else if (holidayFreedays.numberOfFreedays === maxFreedays[0].numberOfFreedays) {
+					maxFreedays.push(holidayFreedays);
+				}
+
+			return maxFreedays	
+			});
 	}
+	
 }
