@@ -21,7 +21,6 @@ export class MaxFreedayService {
 			const filteredHolidays = holidays
 			.sort((a,b) => new Date(a.date).valueOf() - new Date(b.date).valueOf())
 			.filter((holiday, index) => (index === 0 || yesterday(holidays[index]).valueOf() !== new Date(holidays[index-1].date).valueOf()));
-			console.log("filtered: ",filteredHolidays)
 
 			for (let dayIndex = 0; dayIndex < filteredHolidays.length; dayIndex++) {
 			
