@@ -48,9 +48,9 @@ export class DayStatusService {
       .toPromise();
 
     if (responseFromEnrico.data.isWorkDay === true) {
-      dayStatus.dayType = "workday";
+      dayStatus.dayType = process.env.WORKDAY;
     } else if (responseFromEnrico.data.isWorkDay === false){
-      dayStatus.dayType = "freeday";
+      dayStatus.dayType = process.env.FREEDAY;
     } else {
         throw new HttpException(
           {
