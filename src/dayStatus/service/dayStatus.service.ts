@@ -1,8 +1,8 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DaysEntity } from 'src/holiday/models/days.entity';
-import { HolidayInterface } from 'src/holiday/models/holiday.interface';
+import { DayInterface } from 'src/holiday/models/day.interface';
 import { HolidayService } from 'src/holiday/service/holiday.service';
 import { Repository } from 'typeorm';
 import { DayStatusInterface } from '../models/dayStatus.interface';
@@ -28,17 +28,16 @@ export class DayStatusService {
         month: 'short',
         day: 'numeric',
       }),
+      dayOfWeek: (date.getDay() === 0 ? 7: date.getDay()),
       dayType: undefined,
     };
-    const year = date.getFullYear();
-    const holidaysByMonths = await this.holidayService.getCountryHoliday(
-      countryCode,
-      year.toString(),
-    );
-    const isHoliday = ifDayIsHoliday(date, holidaysByMonths);
 
-    if (isHoliday) {
-      dayStatus.dayType = isHoliday;
+    const year = date.getFullYear();
+
+    const isInDB = await this.daysRepository.findOne({where: {countryCode: countryCode, year: year, date: date}});
+
+    if (isInDB) {
+      dayStatus.dayType = isInDB.dayType;
       return dayStatus;
     }
 
@@ -49,28 +48,24 @@ export class DayStatusService {
       )
       .toPromise();
 
-    if (responseFromEnrico.data.isWorkDay) {
-      dayStatus.dayType = 'Workday';
+    if (responseFromEnrico.data.isWorkDay === true) {
+      dayStatus.dayType = process.env.WORKDAY;
+    } else if (responseFromEnrico.data.isWorkDay === false){
+      dayStatus.dayType = process.env.FREEDAY;
     } else {
-      dayStatus.dayType = 'Freeday';
-    }
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: responseFromEnrico.data.error,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
 
-    this.daysRepository.save({countryCode: countryCode, year: year, date: dayStatus.date, dayType: dayStatus.dayType});
+    this.daysRepository.save({countryCode: countryCode, year: year, date: dayStatus.date, dayOfWeek: dayStatus.dayOfWeek, dayType: dayStatus.dayType});
 
     return dayStatus;
   }
-}
-
-function ifDayIsHoliday(date: Date, holidayArr: HolidayInterface): string | boolean {
-  let isHoliday = undefined;
-  for (const month in holidayArr) {
-    holidayArr[month].forEach((day) => {
-      if (date.valueOf() == new Date(day.date).valueOf()) {
-        isHoliday = day.dayType;
-      }
-    });
-  }
-  return isHoliday;
 }
 
 function formatToDmyDate(date: Date): string {

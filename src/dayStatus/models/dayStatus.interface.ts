@@ -1,4 +1,5 @@
 export interface DayStatusInterface {
-  date: String;
+  date: string;
+  dayOfWeek: number;
   dayType: string;
 }

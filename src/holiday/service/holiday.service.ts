@@ -2,8 +2,9 @@ import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { DayInterface } from '../models/day.interface';
 import { DaysEntity } from '../models/days.entity';
-import { HolidayInterface } from '../models/holiday.interface';
+import { HolidayInterface} from '../models/holiday.interface';
 
 @Injectable()
 export class HolidayService {
@@ -13,43 +14,100 @@ export class HolidayService {
     private httpService: HttpService,
   ) {}
 
+  async holidayGroupedByMonths(
+    countryCode: string,
+    year: string,
+  ): Promise<HolidayInterface> {
+
+    const countryHolidays = await this.getCountryHoliday(countryCode, year);
+
+    const holidaysByMonths = {};
+    for (let monthNum = 0; monthNum <= 11; monthNum++) {
+      const tempDate = new Date(new Date(
+        countryHolidays[0].date).getFullYear(), 
+        monthNum, 
+        new Date(countryHolidays[0].date).getDate()
+        ).toUTCString();
+      holidaysByMonths[getMonthName(tempDate).toLowerCase()] = [];
+    };
+  
+    countryHolidays.forEach(day => {
+      const holiday = {
+      date: new Date(day.date).toLocaleDateString("en", {year: "numeric", month: "short", day: "2-digit"}),
+      dayOfWeek: day.dayOfWeek,
+      name: day.name,
+      dayType: day.dayType
+    }; 
+    holidaysByMonths[getMonthName(day.date)].push(holiday);
+    });
+    return holidaysByMonths
+  }
+
   async getCountryHoliday(
     countryCode: string,
-    yearStr: string,
-  ): Promise<HolidayInterface> {
-    const year = parseInt(yearStr);
+    year: string,
+  ): Promise<Array<DayInterface>> {
+    const countryHolidays = [];
+    const publicHoliday = process.env.PUBLIC_HOLIDAY;
+    const daysFromDb = await this.getDaysFromDb(countryCode, year);
 
-    const countryHoliday = await this.daysRepository.find({where: {countryCode: countryCode, year: year, dayType: process.env.PUBLIC_HOLIDAY}});
-    if (countryHoliday.length) { 
-      const tempArr = [];
-      for (let {date: date, dayOfWeek: dow, name: name, dayType: dayType} of countryHoliday) {
-        tempArr.push({date, dow, name, dayType});
-      }
-      const groupedHolidays = groupByMonths(tempArr);
-      return groupedHolidays
+    if(daysFromDb.length) {
+       daysFromDb.filter(day => day.dayType === publicHoliday)
+      .forEach(day => {countryHolidays.push(day);
+      }); 
+      return countryHolidays
     }
+    return this.holidayFromEnrico(countryCode, year);
 
+  }
+
+  async getDaysFromDb(
+    countryCode: string,
+    year: string,
+  ): Promise<Array<DayInterface>> {
+    const countryDays = await this.daysRepository.find({where: {countryCode: countryCode, year: year}});
+
+    if (countryDays.length) { 
+      const days = [];
+      countryDays.forEach(day => {
+        days.push({
+          date: day.date, 
+          dayOfWeek:day.dayOfWeek, 
+          name: day.name, 
+          dayType: day.dayType});
+      })
+      return days;
+    }
+    return [];
+  }
+  
+  async holidayFromEnrico(
+    countryCode: string,
+    year: string,
+  ): Promise<Array<DayInterface>> {
     const responseFromEnrico = await this.httpService
       .get(
-        `${process.env.ENRICO_SERVICE}/${process.env.RESPONSE_TYPE}/${process.env.ENRICO_VERSION}?action=${process.env.ACTION_GET_HOLIDAYS_FOR_YEAR}&year=${yearStr}&country=${countryCode}&holidayType=public_holiday`,
+        `${process.env.ENRICO_SERVICE}/${process.env.RESPONSE_TYPE}/${process.env.ENRICO_VERSION}?action=${process.env.ACTION_GET_HOLIDAYS_FOR_YEAR}&year=${year}&country=${countryCode}&holidayType=public_holiday`,
       )
       .toPromise();
-
+  
     if (responseFromEnrico.data.length) {
-      const tempArr = []
-      responseFromEnrico.data.forEach((data) => {
+      const holidays = []
+      responseFromEnrico.data.forEach(async (data) => {
         const day = {
           countryCode: countryCode,
-          year: year,
-          date: getDate(data.date.year, data.date.month, data.date.day),
+          year: parseInt(year),
+          date: new Date(Date.UTC(data.date.year, data.date.month -1, data.date.day)),
           dayOfWeek: data.date.dayOfWeek,
           name: data.name,
           dayType: data.holidayType,
         }
-        this.daysRepository.save(day);
-        tempArr.push(day);
+        holidays.push({	date: day.date, dayOfWeek: day.dayOfWeek, name: day.name, dayType: day.dayType});
+
+        await this.daysRepository.save(day);
+        
       });
-      return groupByMonths(tempArr);
+      return holidays;
     
     } else {
       throw new HttpException(
@@ -61,32 +119,11 @@ export class HolidayService {
       );
     }
   }
+
 }
 
-export function getMonthName(date: Date): string {
+export function getMonthName(date: string): string {
   return new Date(date).toLocaleString('en', { month: 'short' }).toLowerCase();
 }
 
-function getDate(year: number, month: number, day:number): string {
-  return new Date(year, month - 1, day).toUTCString();
-}
 
-function groupByMonths(arr: Array<{date: Date, dayOfWeek?:number, name?: JSON[], dayType: string}>): HolidayInterface {
-  const holidaysByMonths = {};
-  for (let monthNum = 0; monthNum <= 11; monthNum++) {
-
-  const tempDate = new Date(new Date(arr[0].date).getFullYear(), monthNum, new Date(arr[0].date).getDate());
-  holidaysByMonths[getMonthName(tempDate).toLowerCase()] = [];
-  };
-
-  arr.forEach(day => {
-    const holiday = {
-    date: new Date(day.date).toLocaleDateString("en", {year: "numeric", month: "short", day: "2-digit"}),
-    dayOfWeek: day.dayOfWeek,
-    name: day.name,
-    dayType: day.dayType
-  }; 
-  holidaysByMonths[getMonthName(day.date)].push(holiday);
-  });
-  return holidaysByMonths
-}
