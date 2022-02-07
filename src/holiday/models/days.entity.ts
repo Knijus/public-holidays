@@ -14,8 +14,8 @@ export class DaysEntity {
   @Column()
   date: Date;
 
-  @Column({ nullable: true })
-  dayOfWeek?: number;
+  @Column({nullable: true})
+  dayOfWeek: number;
 
   @Column('json', { nullable: true })
   name?: JSON;
