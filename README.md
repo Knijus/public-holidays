@@ -45,6 +45,8 @@ $ npm install
  - ACTION_GET_HOLIDAYS_FOR_YEAR=getHolidaysForYear
  - ACTION_IS_WORK_DAY=isWorkDay
  - PUBLIC_HOLIDAY=public_holiday
+ - WORKDAY=workday 
+ - FREEDAY=freeday 
 
 ## **Running the app**
 
