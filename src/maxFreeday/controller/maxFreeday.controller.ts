@@ -11,10 +11,10 @@ export class MaxFreedayController {
   @Get()  
   @ApiOkResponse({ 
     description: "Returns max number of freedays in row for given country and year",
-    type: MaxFreedayDto,
+    type: [MaxFreedayDto],
 	})
 
-  async getCountryHolidays(
+  async getMaxFreedays(
     @Query('country') countryCode: string,
     @Query('year') year: string,
   ): Promise<Array<MaxFreedayInterface>> {
