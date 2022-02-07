@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DayStatusService } from "src/dayStatus/service/dayStatus.service";
+import { DayInterface } from "src/holiday/models/day.interface";
 import { HolidayService } from "src/holiday/service/holiday.service";
 import { MaxFreedayInterface } from "../models/maxFreeday.interface";
 
@@ -14,71 +15,83 @@ export class MaxFreedayService {
 		countryCode: string, 
 		year: string
 		): Promise<Array<MaxFreedayInterface>> {
-			const holidays = await this.holidayService.getCountryHoliday(countryCode, year);
-			let maxFreedays = [
-				{
-				holiday: holidays[0].name,
-				numberOfFreedays: 1,
-				days: [
-					{
-					date: new Date(holidays[0].date).toLocaleDateString('en', {
-						year: 'numeric',
-						month: 'short',
-						day: 'numeric',
-						}),
-					dayOfWeek: holidays[0].dayOfWeek,
-					dayType: holidays[0].dayType,
-					}
-				],
-				
-			}]
+			const holidays = await (await this.holidayService.getCountryHoliday(countryCode, year));
+			let maxFreedays = [getFreedayArrBase(holidays[0])];
 
-			for (let dayIndex = 0; dayIndex < holidays.length; dayIndex++) {
-				if(dayIndex <1 || new Date(holidays[dayIndex-1].date).setDate(new Date(holidays[dayIndex-1].date).getDate() +1).valueOf() !== new Date(holidays[dayIndex].date).valueOf()) {
-					const holidayFreedays = {
-						holiday: holidays[dayIndex].name,
-						numberOfFreedays: 1,
-						days: [{
-							date:  new Date(holidays[dayIndex].date).toLocaleDateString('en', {
-								year: 'numeric',
-								month: 'short',
-								day: 'numeric',
-								}),
-							dayOfWeek: holidays[dayIndex].dayOfWeek,
-							dayType: holidays[dayIndex].dayType,
-						}],
-						
-					}
-					
-					for (let i = 1; i < 5; i++) {
-						let dayDate = new Date(holidays[dayIndex].date);
-						dayDate.setDate(dayDate.getDate()-i);
-						const dayStatus = await this.dayStatusService.getDayStatus(countryCode, dayDate.toString());
-						if(dayStatus.dayType === "workday") {
-							break;
-						}	
-						holidayFreedays.days.unshift(dayStatus);
+			const filteredHolidays = holidays
+			.sort((a,b) => new Date(a.date).valueOf() - new Date(b.date).valueOf())
+			.filter((holiday, index) => (index === 0 || yesterday(holidays[index]).valueOf() !== new Date(holidays[index-1].date).valueOf()));
+			console.log("filtered: ",filteredHolidays)
+
+			for (let dayIndex = 0; dayIndex < filteredHolidays.length; dayIndex++) {
+			
+				const holidayFreedays = getFreedayArrBase(filteredHolidays[dayIndex])
+
+				let searchForPrevDay = true, searchForNextDay = true;
+				for (let i = 1; i < 5; i++) {
+					const prevDay = new Date(filteredHolidays[dayIndex].date);
+					prevDay.setDate(prevDay.getDate() - i);
+
+					const nextDay = new Date(filteredHolidays[dayIndex].date);
+					nextDay.setDate(nextDay.getDate() + i);
+
+					const [prevDayStatus, nextDayStatus] = await Promise.all([
+						this.dayStatusService.getDayStatus(countryCode, prevDay.toString()),
+						this.dayStatusService.getDayStatus(countryCode, nextDay.toString()),
+					]);
+
+					if (searchForPrevDay) {
+						if (prevDayStatus.dayType === 'workday') {
+						searchForPrevDay = false;
+						} else {
+						holidayFreedays.days.unshift(prevDayStatus);
 						holidayFreedays.numberOfFreedays++;
+						}
 					}
-					for (let i = 1; i < 5; i++) {
-						let dayDate = new Date(holidays[dayIndex].date);
-						dayDate.setDate(dayDate.getDate()+i);
-						const dayStatus = await this.dayStatusService.getDayStatus(countryCode, dayDate.toString());
-						if(dayStatus.dayType === "workday") {
-							break;
-						}	
-						holidayFreedays.days.push(dayStatus);
+
+					if (searchForNextDay) {
+						if (nextDayStatus.dayType === 'workday') {
+						searchForNextDay = false;
+						} else {
+						holidayFreedays.days.push(nextDayStatus);
 						holidayFreedays.numberOfFreedays++;
+						}
 					}
-					if(holidayFreedays.numberOfFreedays > maxFreedays[0].numberOfFreedays) {
-						maxFreedays = [];
-						maxFreedays.push(holidayFreedays);
-					} else if (holidayFreedays.numberOfFreedays === maxFreedays[0].numberOfFreedays) {
-						maxFreedays.push(holidayFreedays);
+					if(!searchForNextDay && !searchForPrevDay){
+						if(holidayFreedays.numberOfFreedays > maxFreedays[0].numberOfFreedays) {
+							maxFreedays = [];
+							maxFreedays.push(holidayFreedays);
+						} else if (holidayFreedays.numberOfFreedays === maxFreedays[0].numberOfFreedays) {
+							maxFreedays.push(holidayFreedays);
+						}
+						break;
 					}
 				}
-
 			}
 			return maxFreedays
 	}
+}
+
+function getFreedayArrBase(holiday: DayInterface): MaxFreedayInterface {
+	const freedayBaseArray = {
+	holiday: holiday.name,
+	numberOfFreedays: 1,
+	days: [
+		{
+		date: new Date(holiday.date).toLocaleDateString('en', {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+			}),
+		dayOfWeek: holiday.dayOfWeek,
+		dayType: holiday.dayType,
+		}]
+	}
+	return freedayBaseArray
+}
+
+function yesterday(day: DayInterface): Date {
+	const today = new Date(day.date);
+	const yesterday = new Date(today.setDate(today.getDate()-1));
+	return yesterday;		
 }

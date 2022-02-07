@@ -50,12 +50,12 @@ export class HolidayService {
     const countryHolidays = [];
     const publicHoliday = process.env.PUBLIC_HOLIDAY;
     const daysFromDb = await this.getDaysFromDb(countryCode, year);
+
     if(daysFromDb.length) {
-      daysFromDb.forEach(day => {
-        if (day.dayType === publicHoliday) {
-          countryHolidays.push(day);
-        }
+       daysFromDb.filter(day => day.dayType === publicHoliday)
+      .forEach(day => {countryHolidays.push(day);
       }); 
+      return countryHolidays
     }
     return this.holidayFromEnrico(countryCode, year);
 
