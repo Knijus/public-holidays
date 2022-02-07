@@ -1,8 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class DayStatusDto {
   @ApiProperty()
-  date: String;
+  date: string;
 
   @ApiProperty()
   dayType: string;

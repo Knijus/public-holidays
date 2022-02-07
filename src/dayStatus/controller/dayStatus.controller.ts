@@ -9,10 +9,11 @@ export class DayStatusController {
   constructor(private readonly DayStatusService: DayStatusService) {}
 
   @Get()
-  @ApiOkResponse({ 
-    description: "Returns specific day status for given date and country. Day status can be workday, freeday or public holiday.",
-    type: DayStatusDto })
-
+  @ApiOkResponse({
+    description:
+      'Returns specific day status for given date and country. Day status can be workday, freeday or public holiday.',
+    type: DayStatusDto,
+  })
   async getDayStatus(
     @Query('country') countryCode: string,
     @Query('date') date: string,

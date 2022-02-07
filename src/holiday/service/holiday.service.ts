@@ -19,14 +19,25 @@ export class HolidayService {
   ): Promise<HolidayInterface> {
     const year = parseInt(yearStr);
 
-    const countryHoliday = await this.daysRepository.find({where: {countryCode: countryCode, year: year, dayType: process.env.PUBLIC_HOLIDAY}});
-    if (countryHoliday.length) { 
+    const countryHoliday = await this.daysRepository.find({
+      where: {
+        countryCode: countryCode,
+        year: year,
+        dayType: process.env.PUBLIC_HOLIDAY,
+      },
+    });
+    if (countryHoliday.length) {
       const tempArr = [];
-      for (let {date: date, dayOfWeek: dow, name: name, dayType: dayType} of countryHoliday) {
-        tempArr.push({date, dow, name, dayType});
+      for (const {
+        date: date,
+        dayOfWeek: dow,
+        name: name,
+        dayType: dayType,
+      } of countryHoliday) {
+        tempArr.push({ date, dow, name, dayType });
       }
       const groupedHolidays = groupByMonths(tempArr);
-      return groupedHolidays
+      return groupedHolidays;
     }
 
     const responseFromEnrico = await this.httpService
@@ -36,7 +47,7 @@ export class HolidayService {
       .toPromise();
 
     if (responseFromEnrico.data.length) {
-      const tempArr = []
+      const tempArr = [];
       responseFromEnrico.data.forEach((data) => {
         const day = {
           countryCode: countryCode,
@@ -45,12 +56,11 @@ export class HolidayService {
           dayOfWeek: data.date.dayOfWeek,
           name: data.name,
           dayType: data.holidayType,
-        }
+        };
         this.daysRepository.save(day);
         tempArr.push(day);
       });
       return groupByMonths(tempArr);
-    
     } else {
       throw new HttpException(
         {
@@ -67,26 +77,40 @@ export function getMonthName(date: Date): string {
   return new Date(date).toLocaleString('en', { month: 'short' }).toLowerCase();
 }
 
-function getDate(year: number, month: number, day:number): string {
+function getDate(year: number, month: number, day: number): string {
   return new Date(year, month - 1, day).toUTCString();
 }
 
-function groupByMonths(arr: Array<{date: Date, dayOfWeek?:number, name?: JSON[], dayType: string}>): HolidayInterface {
+function groupByMonths(
+  arr: Array<{
+    date: Date;
+    dayOfWeek?: number;
+    name?: JSON[];
+    dayType: string;
+  }>,
+): HolidayInterface {
   const holidaysByMonths = {};
   for (let monthNum = 0; monthNum <= 11; monthNum++) {
+    const tempDate = new Date(
+      new Date(arr[0].date).getFullYear(),
+      monthNum,
+      new Date(arr[0].date).getDate(),
+    );
+    holidaysByMonths[getMonthName(tempDate).toLowerCase()] = [];
+  }
 
-  const tempDate = new Date(new Date(arr[0].date).getFullYear(), monthNum, new Date(arr[0].date).getDate());
-  holidaysByMonths[getMonthName(tempDate).toLowerCase()] = [];
-  };
-
-  arr.forEach(day => {
+  arr.forEach((day) => {
     const holiday = {
-    date: new Date(day.date).toLocaleDateString("en", {year: "numeric", month: "short", day: "2-digit"}),
-    dayOfWeek: day.dayOfWeek,
-    name: day.name,
-    dayType: day.dayType
-  }; 
-  holidaysByMonths[getMonthName(day.date)].push(holiday);
+      date: new Date(day.date).toLocaleDateString('en', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+      }),
+      dayOfWeek: day.dayOfWeek,
+      name: day.name,
+      dayType: day.dayType,
+    };
+    holidaysByMonths[getMonthName(day.date)].push(holiday);
   });
-  return holidaysByMonths
+  return holidaysByMonths;
 }

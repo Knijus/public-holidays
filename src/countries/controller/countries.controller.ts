@@ -9,9 +9,10 @@ export class CountriesController {
   constructor(private readonly countriesService: CountriesService) {}
 
   @Get()
-  @ApiOkResponse({ 
-    description: "Returns list of all supported countries.",
-    type: CountryDto })
+  @ApiOkResponse({
+    description: 'Returns list of all supported countries.',
+    type: CountryDto,
+  })
   async getCountries(): Promise<CountriesInterface[]> {
     return await this.countriesService.getCountries();
   }

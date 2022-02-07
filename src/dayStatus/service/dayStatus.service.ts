@@ -21,7 +21,7 @@ export class DayStatusService {
     inputDate: string,
   ): Promise<DayStatusInterface> {
     const date = new Date(inputDate);
-    
+
     const dayStatus = {
       date: date.toLocaleDateString('en', {
         year: 'numeric',
@@ -55,13 +55,21 @@ export class DayStatusService {
       dayStatus.dayType = 'Freeday';
     }
 
-    this.daysRepository.save({countryCode: countryCode, year: year, date: dayStatus.date, dayType: dayStatus.dayType});
+    this.daysRepository.save({
+      countryCode: countryCode,
+      year: year,
+      date: dayStatus.date,
+      dayType: dayStatus.dayType,
+    });
 
     return dayStatus;
   }
 }
 
-function ifDayIsHoliday(date: Date, holidayArr: HolidayInterface): string | boolean {
+function ifDayIsHoliday(
+  date: Date,
+  holidayArr: HolidayInterface,
+): string | boolean {
   let isHoliday = undefined;
   for (const month in holidayArr) {
     holidayArr[month].forEach((day) => {
@@ -74,5 +82,5 @@ function ifDayIsHoliday(date: Date, holidayArr: HolidayInterface): string | bool
 }
 
 function formatToDmyDate(date: Date): string {
-    return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+  return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 }

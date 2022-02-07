@@ -2,7 +2,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class DaysEntity {
-
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -15,14 +14,12 @@ export class DaysEntity {
   @Column()
   date: Date;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   dayOfWeek?: number;
 
-  @Column("json",{nullable: true})
+  @Column('json', { nullable: true })
   name?: JSON;
 
   @Column()
   dayType: string;
 }
-
-

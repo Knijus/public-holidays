@@ -1,35 +1,32 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 class Year {
-	  
-	@ApiProperty()			
-	day: number;
+  @ApiProperty()
+  day: number;
 
-	@ApiProperty()
-	month: number;
+  @ApiProperty()
+  month: number;
 
-	@ApiProperty()
-	year: number;
-  }
+  @ApiProperty()
+  year: number;
+}
 
 export class CountryDto {
-	@ApiProperty()
-	countryCode: string;
+  @ApiProperty()
+  countryCode: string;
 
-	@ApiProperty()
-	regions: string[];
+  @ApiProperty()
+  regions: string[];
 
-	@ApiProperty()
-	holidayTypes: string[];
+  @ApiProperty()
+  holidayTypes: string[];
 
-	@ApiProperty()
-	fullName: string;
+  @ApiProperty()
+  fullName: string;
 
-	@ApiProperty()
-	fromDate: Year;
+  @ApiProperty()
+  fromDate: Year;
 
-
-	@ApiProperty()
-	toDate: Year;
+  @ApiProperty()
+  toDate: Year;
 }
-	
